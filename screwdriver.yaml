@@ -5,7 +5,6 @@ jobs:
     main:
         environment:
             SD_SONAR_OPTS: "-Dsonar.sources=index.js,lib -Dsonar.tests=test -Dsonar.javascript.lcov.reportPaths=artifacts/coverage/lcov.info -Dsonar.testExecutionReportPaths=artifacts/report/test.xml"
-        requires: [~pr, ~commit]
         steps:
             - install: npm install
             - test: npm test
@@ -27,9 +26,9 @@ jobs:
             screwdriver.cd/dockerEnabled: true
             screwdriver.cd/dockerCpu: LOW
             screwdriver.cd/dockerRam: LOW
-        requires: publish
+        requires: ~commit
         steps:
-            - init: sd-step exec core/git "clone https://github.com/screwdriver-cd/toolbox.git ci && ./ci/git-latest.sh"
+            - init: sd-step exec core/git "git clone https://github.com/screwdriver-cd/toolbox.git ci" && ./ci/git-latest.sh
             - build: | 
                     DOCKER_TAG=`cat VERSION`
                     docker build .
