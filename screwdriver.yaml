@@ -19,6 +19,25 @@ jobs:
             # Pushing tags to Git
             - GH_TOKEN
 
+    docker-publish:
+        image: docker:dind
+        annotations:
+            screwdriver.cd/cpu: MICRO
+            screwdriver.cd/ram: LOW
+            screwdriver.cd/dockerEnabled: true
+            screwdriver.cd/dockerCpu: LOW
+            screwdriver.cd/dockerRam: LOW
+        requires: publish
+        steps:
+            - build: | 
+                    DOCKER_TAG=`cat VERSION`
+                    docker build .
+        environment:
+            # Docker hub repo
+            DOCKER_REPO: screwdrivercd/buildcluster-queue-worker
+        secrets:
+            # Trigger a Docker Hub build
+            - DOCKER_TRIGGER
     docker-trigger:
         requires: publish
         steps:
