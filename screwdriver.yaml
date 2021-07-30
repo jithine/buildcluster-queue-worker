@@ -28,10 +28,14 @@ jobs:
             screwdriver.cd/dockerRam: LOW
         requires: ~commit
         steps:
-            - init: sd-step exec core/git "git clone https://github.com/screwdriver-cd/toolbox.git ci" && ./ci/git-latest.sh
+            - init: |
+                  alias git="sd-step exec core/git git"
+                  git clone https://github.com/screwdriver-cd/toolbox.git ci
+                  ./ci/git-latest.sh
             - build: | 
                     DOCKER_TAG=`cat VERSION`
                     docker build .
+                    docker images
         environment:
             # Docker hub repo
             DOCKER_REPO: screwdrivercd/buildcluster-queue-worker
