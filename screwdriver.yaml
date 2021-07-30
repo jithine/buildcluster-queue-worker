@@ -1,5 +1,8 @@
 shared:
     image: node:12
+    environment:
+        DOCKER_REPO: screwdrivercd/buildcluster-queue-worker
+
 
 jobs:
     main:
@@ -34,7 +37,8 @@ jobs:
                   ./ci/git-latest.sh
             - build: | 
                     DOCKER_TAG=`cat VERSION`
-                    docker build .
+                    docker build -t $DOCKER_REPO/latest .
+                    docker tag $DOCKER_REPO/latest $DOCKER_REPO/$DOCKER_TAG
                     docker images
         environment:
             # Docker hub repo
