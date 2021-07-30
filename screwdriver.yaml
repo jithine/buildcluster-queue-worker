@@ -40,9 +40,9 @@ jobs:
                     docker build -t $DOCKER_REPO/latest .
                     docker tag $DOCKER_REPO/latest $DOCKER_REPO/$DOCKER_TAG
                     docker images
-        environment:
-            # Docker hub repo
-            DOCKER_REPO: screwdrivercd/buildcluster-queue-worker
+            - publish:
+                    docker push $DOCKER_REPO/latest 
+                    docker push $DOCKER_REPO/$DOCKER_TAG     
         secrets:
             # Trigger a Docker Hub build
             - DOCKER_TRIGGER
