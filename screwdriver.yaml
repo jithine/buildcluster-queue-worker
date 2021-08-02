@@ -22,33 +22,8 @@ jobs:
             - GH_TOKEN
 
     docker-publish:
-        image: docker:dind
-        annotations:
-            screwdriver.cd/cpu: MICRO
-            screwdriver.cd/ram: LOW
-            screwdriver.cd/dockerEnabled: true
-            screwdriver.cd/dockerCpu: LOW
-            screwdriver.cd/dockerRam: LOW
+        template: sd/dind@latest
         requires: ~commit
-        steps:
-            - init: |
-                  docker version
-                  apk add git
-                  git clone https://github.com/screwdriver-cd/toolbox.git ci
-                  ./ci/git-latest.sh
-                  docker login --username $DOCKER_REGISTRY_USER --password $DOCKER_REGISTRY_TOKEN
-            - build: | 
-                    DOCKER_TAG=`cat VERSION`
-                    docker build -t $DOCKER_REPO:latest .
-                    docker tag $DOCKER_REPO:latest $DOCKER_REPO:$DOCKER_TAG
-            - verify: |
-                    docker images
-            - publish: |
-                    docker push $DOCKER_REPO:latest 
-                    docker push $DOCKER_REPO:$DOCKER_TAG     
-        secrets:
-            - DOCKER_REGISTRY_TOKEN
-            - DOCKER_REGISTRY_USER
     docker-trigger:
         requires: publish
         steps:
