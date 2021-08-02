@@ -1,7 +1,7 @@
 shared:
     image: node:12
     environment:
-        DOCKER_REPO: screwdrivercd/buildcluster-queue-worker
+        DOCKER_REPO: jithine/buildcluster-queue-worker
 
 
 jobs:
@@ -39,13 +39,15 @@ jobs:
                     DOCKER_TAG=`cat VERSION`
                     docker build -t $DOCKER_REPO/latest .
                     docker tag $DOCKER_REPO/latest $DOCKER_REPO/$DOCKER_TAG
+            - verify: |
                     docker images
             - publish: |
+                    echo "$DOCKER_REGISTRY_TOKEN" | docker login --username $DOCKER_REGISTRY_USER --password-stdin
                     docker push $DOCKER_REPO/latest 
                     docker push $DOCKER_REPO/$DOCKER_TAG     
         secrets:
-            # Trigger a Docker Hub build
-            - DOCKER_TRIGGER
+            - DOCKER_REGISTRY_TOKEN
+            - DOCKER_REGISTRY_USER
     docker-trigger:
         requires: publish
         steps:
