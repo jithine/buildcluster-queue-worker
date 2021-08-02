@@ -1,11 +1,11 @@
 shared:
-    image: node:12
     environment:
         DOCKER_REPO: jithine/buildcluster-queue-worker
 
 
 jobs:
     main:
+        image: node:12
         environment:
             SD_SONAR_OPTS: "-Dsonar.sources=index.js,lib -Dsonar.tests=test -Dsonar.javascript.lcov.reportPaths=artifacts/coverage/lcov.info -Dsonar.testExecutionReportPaths=artifacts/report/test.xml"
         steps:
@@ -24,19 +24,9 @@ jobs:
     docker-publish:
         template: sd/dind@latest
         requires: ~commit
-    docker-trigger:
-        requires: publish
-        steps:
-            - trigger: git clone https://github.com/screwdriver-cd/toolbox.git ci && ./ci/git-latest.sh && DOCKER_TAG=`cat VERSION` ./ci/docker-trigger.sh
-        environment:
-            # Docker hub repo
-            DOCKER_REPO: screwdrivercd/buildcluster-queue-worker
-        secrets:
-            # Trigger a Docker Hub build
-            - DOCKER_TRIGGER
-
     # Deploy to beta environment
     beta:
+        image: node:12    
         requires: docker-trigger
         steps:
             - setup-ci: git clone https://github.com/screwdriver-cd/toolbox.git ci
@@ -99,6 +89,7 @@ jobs:
 
     # Deploy to our prod environment and run tests
     prod:
+        image: node:12
         requires: functional-test
         steps:
             - setup-ci: git clone https://github.com/screwdriver-cd/toolbox.git ci
@@ -118,6 +109,7 @@ jobs:
 
     # Deploy to our prod environment and run tests
     prod-bf1:
+        image: node:12
         requires: functional-test
         steps:
             - setup-ci: git clone https://github.com/screwdriver-cd/toolbox.git ci
